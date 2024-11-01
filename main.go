@@ -14,8 +14,6 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
-// TODO: Nothing
-
 type Tuple struct {
 	X, Y int
 }
@@ -175,7 +173,7 @@ func run() { // run Pixel
 		mouse_pos := win.MousePosition()
 		mouse_x, mouse_y := int(mouse_pos.X), int(mouse_pos.Y)
 
-		elapsed := current_time.Sub(last_time)
+		elapsed := current_time.Sub(last_time) // frame rate counter
 		last_time = current_time
 		current_time = time.Now()
 
@@ -234,7 +232,7 @@ func neighbours(cells map[Tuple]struct{}) map[Tuple]int { // count the neighbour
 	return frequency
 }
 
-func next_evolution(alive_cells map[Tuple]struct{}) map[Tuple]struct{} {
+func next_evolution(alive_cells map[Tuple]struct{}) map[Tuple]struct{} { // iterates the game of life
 	neighbour_counts := neighbours(alive_cells)
 	evolved_cells := make(map[Tuple]struct{})
 
