@@ -14,7 +14,7 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
-// TODO:
+// TODO: Nothing
 
 type Tuple struct {
 	X, Y int
