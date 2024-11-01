@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -17,27 +18,35 @@ type Tuple struct {
 	X, Y int
 }
 
-const (
-	width     float64 = 2000
-	height    float64 = 1500
-	text_size float64 = 2
+var (
+	InputW = flag.Int("w", 2000, "Set the screen width")
+	InputH = flag.Int("h", 1500, "Set the screen height")
+	InputS = flag.Int("s", 20, "Set the scale of the game")
+	inputF = flag.Int("f", 20, "Set the fps limit")
 )
 
 func run() { // run Pixel
 	var (
-		update_rate  int           = 20
-		fps          time.Duration = time.Second / time.Duration(update_rate)
-		pause_fps    time.Duration = time.Second / 100
+		width       float64 = float64(*InputW)
+		height      float64 = float64(*InputH)
+		cell_size   float64 = float64(*InputS)
+		update_rate int     = *inputF
+
 		last_time    time.Time
 		current_time time.Time
-		running      bool    = false
-		cells                = make(map[Tuple]struct{})
-		debug        bool    = true
-		imd                  = imdraw.New(nil)
-		step_size    float64 = 2
-		cell_size    float64 = 20
+		fps          time.Duration = time.Second / time.Duration(update_rate)
+		pause_fps    time.Duration = time.Second / 100
+
+		cells               = make(map[Tuple]struct{})
+		current_gen int     = 0
+		running     bool    = false
+		debug       bool    = true
+		step_size   float64 = 2
+
+		imd           *imdraw.IMDraw = imdraw.New(nil)
+		text_size     float64        = 0.0005 * (height + width)
+		camera_offset pixel.Vec      = pixel.V(0, 0)
 	)
-	camera_offset := pixel.V(0, 0)
 
 	ticker := time.NewTicker(pause_fps) // manage max frame delay
 	defer ticker.Stop()
@@ -76,6 +85,7 @@ func run() { // run Pixel
 		draw_cells(cells)
 		if running {
 			cells = next_evolution(cells)
+			current_gen++
 
 		}
 	}
@@ -149,12 +159,12 @@ func run() { // run Pixel
 		atlas := text.NewAtlas(basicfont.Face7x13, text.ASCII)
 		txt := text.New(pixel.V(10, win.Bounds().H()-20), atlas)
 
-		fmt.Fprintln(txt, "Press SPACE to start/pause.")
-		fmt.Fprintln(txt, "Click to draw new cells.")
-		fmt.Fprintln(txt, "Press 'C' to reset the grid.")
 		fmt.Fprintln(txt, "Press 'Q' to quit.")
+		fmt.Fprintln(txt, "Use 'LEFT MOUSE' and 'RIGHT MOUSE' to draw and erase cells.")
+		fmt.Fprintln(txt, "Press SPACE to start/pause.")
+		fmt.Fprintln(txt, "Press 'C' to reset the grid.")
 		fmt.Fprintln(txt, "Press 'Up' / 'Down' to change the frame limit.")
-		fmt.Fprintln(txt, "Press 'H' to toggle info.")
+		fmt.Fprintln(txt, "Press 'H' to toggle the info overlay.")
 
 		txt.Draw(win, pixel.IM.Scaled(txt.Orig, text_size))
 
@@ -176,6 +186,7 @@ func run() { // run Pixel
 		fmt.Fprintf(txt, "Max frame time: %d ms \n", fps.Milliseconds())
 		fmt.Fprintf(txt, "Frame time: %d ms \n", elapsed.Milliseconds())
 		fmt.Fprintf(txt, "Alive cells: %d \n", len(cells))
+		fmt.Fprintf(txt, "Current generation: %d\n", current_gen)
 
 		text_width := txt.Bounds().W()
 		pos := pixel.V(win.Bounds().W()-2*text_width-20, win.Bounds().H()-20)
@@ -201,6 +212,8 @@ func run() { // run Pixel
 }
 
 func main() {
+	flag.Parse()
+
 	pixelgl.Run(run)
 }
 
