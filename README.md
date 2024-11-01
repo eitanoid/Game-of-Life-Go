@@ -5,7 +5,7 @@
 
 # What is the Game of Life?
 
-The Game of Life (GoL) is a 0 player game, that is a game that evolves from an initial state. GoL runs on a 2D grid of cells which evolve via the following rules:
+The Game of Life (GoL) is a 0 player game, that is a game that evolves from an initial state with no further interaction. GoL runs on a 2D grid of cells which evolve via the following rules:
 
 - A cell with fewer than 2 neighbours dies from under population.
 - A living cell with 2 or 3 neighbours lives on to the next generation.
@@ -23,7 +23,7 @@ An interactive solution to the game of life using Golang and the `Pixel` 2D game
 
 
 ## Features
-- **Interactive controls** for starting, pausing, and resetting the game.
+- **Interactive controls** for starting, pausing, drawing and erasing cells, and resetting the game.
 - **Pan** to view different parts of the grid.
 - **Toggleable grid information** (frame rate, cell count, current generation).
 
