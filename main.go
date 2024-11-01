@@ -23,13 +23,9 @@ const (
 	text_size float64 = 2
 )
 
-var (
-	cell_size   float64 = 20
-	update_rate int     = 20
-)
-
 func run() { // run Pixel
 	var (
+		update_rate  int           = 20
 		fps          time.Duration = time.Second / time.Duration(update_rate)
 		pause_fps    time.Duration = time.Second / 100
 		last_time    time.Time
@@ -39,6 +35,7 @@ func run() { // run Pixel
 		debug        bool    = true
 		imd                  = imdraw.New(nil)
 		step_size    float64 = 2
+		cell_size    float64 = 20
 	)
 	camera_offset := pixel.V(0, 0)
 
@@ -55,7 +52,7 @@ func run() { // run Pixel
 		panic(err)
 	}
 
-	add_rect := func(x float64, y float64, cell_size float64) {
+	add_rect := func(x float64, y float64, cell_size float64) { //adds rect to draw queue
 
 		imd.Color = pixel.RGB(0, 255, 0)
 		imd.Push(pixel.V(x, y))
@@ -207,7 +204,7 @@ func main() {
 	pixelgl.Run(run)
 }
 
-func neighbours(cells map[Tuple]struct{}) map[Tuple]int { // count the neighbour cells
+func neighbours(cells map[Tuple]struct{}) map[Tuple]int { // count the neighbour cells of each cell alive
 
 	frequency := make(map[Tuple]int)
 
