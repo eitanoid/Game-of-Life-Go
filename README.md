@@ -27,6 +27,22 @@ An interactive solution to the game of life using Golang and the `Pixel` 2D game
 - **Pan** to view different parts of the grid.
 - **Toggleable grid information** (frame rate, cell count, current generation).
 
+## Usage
+
+You can pass the following flags to the executable:
+
+```bash
+
+usage: Game-Of-Life-Go [<flags>]
+
+Flags:
+-w    The width of the grid  (default 2000)
+-h    The height of the grid (default 1500)
+-s    The scale of the cells (default 20)
+-f    Set the game FPS limit (default 20)
+```
+
+
 ## Installation
 ### Prerequisites
 - **Go**: This project requires the Go programming language. You can download it from [https://golang.org/dl/](https://golang.org/dl/).
