@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"time"
 
@@ -46,11 +45,6 @@ func run() { // run Pixel
 	ticker := time.NewTicker(pause_fps) // manage max frame delay
 	defer ticker.Stop()
 
-	for i := 0; len(cells) < 20; i++ { //spawns a bunch of random cells
-		cell := Tuple{}
-		cell.X, cell.Y = rand.Intn(1400)+200, rand.Intn(700)+200
-		cells[cell] = struct{}{}
-	}
 	cfg := pixelgl.WindowConfig{
 		Title:  "Game of Life!",
 		Bounds: pixel.R(0, 0, width, height),
@@ -93,7 +87,7 @@ func run() { // run Pixel
 
 		switch {
 
-		case win.Pressed(pixelgl.MouseButtonLeft) && !running:
+		case win.Pressed(pixelgl.MouseButtonLeft) && !running: // drawing new cells
 			mousePos := win.MousePosition()
 			x := int(mousePos.X + camera_offset.X*cell_size)
 			y := int(mousePos.Y + camera_offset.Y*cell_size)
@@ -106,7 +100,7 @@ func run() { // run Pixel
 				cells[new_cell] = struct{}{}
 			}
 
-		case win.Pressed(pixelgl.MouseButtonRight) && !running:
+		case win.Pressed(pixelgl.MouseButtonRight) && !running: // erasing cells
 			mousePos := win.MousePosition()
 			x := int(mousePos.X + camera_offset.X*cell_size)
 			y := int(mousePos.Y + camera_offset.Y*cell_size)
@@ -114,7 +108,7 @@ func run() { // run Pixel
 			rem_cell := Tuple{x / scale, y / scale}
 			delete(cells, rem_cell)
 
-		case win.Pressed(pixelgl.KeyUp):
+		case win.Pressed(pixelgl.KeyUp): // changing game speed
 			update_rate++
 			fps = time.Second / time.Duration(update_rate)
 			ticker.Reset(fps)
@@ -124,7 +118,7 @@ func run() { // run Pixel
 			fps = time.Second / time.Duration(update_rate)
 			ticker.Reset(fps)
 
-		case win.JustPressed(pixelgl.KeySpace):
+		case win.JustPressed(pixelgl.KeySpace): // pause game and change run speed for smoother drawing
 			running = !running
 			if running {
 				ticker.Reset(fps)
