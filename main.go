@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"image/png"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -20,11 +22,12 @@ type Tuple struct {
 }
 
 var (
-	InputW = flag.Int("w", 2000, "Set the screen width")
-	InputH = flag.Int("h", 1500, "Set the screen height")
-	InputS = flag.Int("s", 20, "Set the scale of the game")
-	inputF = flag.Int("f", 20, "Set the fps limit")
-	inputP = flag.String("p", "", "Import a PNG")
+	InputW  = flag.Int("w", 2000, "Set the screen width")
+	InputH  = flag.Int("h", 1500, "Set the screen height")
+	InputS  = flag.Int("s", 20, "Set the scale of the game")
+	inputF  = flag.Int("f", 20, "Set the fps limit")
+	inputP  = flag.String("p", "", "Import a PNG")
+	inputBS = flag.String("bs", "B3/S23", "select cellular automaton rules in neighbours to be born / neighbours to survive form")
 )
 
 func run() { // run Pixel
@@ -48,9 +51,45 @@ func run() { // run Pixel
 		imd           *imdraw.IMDraw = imdraw.New(nil)
 		text_size     float64        = 0.0005 * (height + width)
 		camera_offset pixel.Vec      = pixel.V(0, 0)
+
+		B = make(map[int]bool) // neighbours to be born / neighbours to survive
+		S = make(map[int]bool)
 	)
 
+	validate_rules := func(inputBS *string) {
+		BS := strings.Split(*inputBS, "/")
+		B_in := BS[0][1:]
+		S_in := BS[1][1:]
+		for _, rule := range B_in {
+			r, err := strconv.Atoi(string(rule))
+
+			if err != nil {
+				B = map[int]bool{3: true}
+				S = map[int]bool{2: true, 3: true}
+				fmt.Println("rule invalid, defaulting to game of life")
+
+				return
+			}
+			B[r] = true
+		}
+		for _, rule := range S_in {
+			r, err := strconv.Atoi(string(rule))
+			if err != nil {
+				B = map[int]bool{3: true}
+				S = map[int]bool{2: true, 3: true}
+				fmt.Println("rule invalid, defaulting to game of life")
+				return
+			}
+			S[r] = true
+		}
+	}
+
 	load_img := func(name string, cells map[Tuple]struct{}) { // load a png into the game
+
+		if name == "" {
+			return
+		}
+
 		file, err := os.Open(name)
 		if err != nil {
 			fmt.Println(err)
@@ -78,8 +117,6 @@ func run() { // run Pixel
 		}
 
 	}
-
-	load_img(*inputP, cells)
 
 	ticker := time.NewTicker(pause_fps) // manage max frame delay
 	defer ticker.Stop()
@@ -117,7 +154,7 @@ func run() { // run Pixel
 	play_life := func() {
 		draw_cells(cells)
 		if running {
-			cells = next_evolution(cells)
+			cells = next_evolution(cells, B, S)
 			current_gen++
 
 		}
@@ -227,6 +264,10 @@ func run() { // run Pixel
 		txt.Draw(win, pixel.IM.Moved(pos).Scaled(pos, text_size))
 	}
 
+	// init functions
+	load_img(*inputP, cells) // loads image
+	validate_rules(inputBS)
+
 	for !win.Closed() { //update loop
 
 		win.Clear(colornames.Black)
@@ -246,7 +287,6 @@ func run() { // run Pixel
 
 func main() {
 	flag.Parse()
-
 	pixelgl.Run(run)
 }
 
@@ -269,13 +309,13 @@ func neighbours(cells map[Tuple]struct{}) map[Tuple]int { // count the neighbour
 	return frequency
 }
 
-func next_evolution(alive_cells map[Tuple]struct{}) map[Tuple]struct{} { // iterates the game of life
+func next_evolution(alive_cells map[Tuple]struct{}, B, S map[int]bool) map[Tuple]struct{} { // iterates the game of life
 	neighbour_counts := neighbours(alive_cells)
 	evolved_cells := make(map[Tuple]struct{})
 
 	for cell, count := range neighbour_counts {
-		_, isAlive := alive_cells[cell]
-		if count == 3 || count == 2 && isAlive {
+		_, is_alive := alive_cells[cell]
+		if B[count] && !is_alive || S[count] && is_alive { // && !isAlive || count == 7 && isAlive {
 			evolved_cells[cell] = struct{}{}
 		}
 	}
