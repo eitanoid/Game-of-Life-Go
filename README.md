@@ -5,6 +5,8 @@
 
 # What is the Game of Life?
 
+![Screenshot from 2024-11-06 16-47-29](https://github.com/user-attachments/assets/ff659f00-f321-4097-bdad-9e62617377bb)
+
 The Game of Life (GoL) is a 0 player game, that is a game that evolves from an initial state with no further interaction. GoL runs on a 2D grid of cells which evolve via the following rules:
 
 - A cell with fewer than 2 neighbours dies from under population.
