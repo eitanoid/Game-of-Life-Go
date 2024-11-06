@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"image/png"
 	"os"
 	"time"
 
@@ -23,6 +24,7 @@ var (
 	InputH = flag.Int("h", 1500, "Set the screen height")
 	InputS = flag.Int("s", 20, "Set the scale of the game")
 	inputF = flag.Int("f", 20, "Set the fps limit")
+	inputP = flag.String("p", "", "Import a PNG")
 )
 
 func run() { // run Pixel
@@ -47,6 +49,37 @@ func run() { // run Pixel
 		text_size     float64        = 0.0005 * (height + width)
 		camera_offset pixel.Vec      = pixel.V(0, 0)
 	)
+
+	load_img := func(name string, cells map[Tuple]struct{}) { // load a png into the game
+		file, err := os.Open(name)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer file.Close()
+
+		img, err := png.Decode(file)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		bounds := img.Bounds()
+		var val uint32 = 0 * 256
+		len_x, len_y := bounds.Dx(), bounds.Dy()
+		for x := 0; x < len_x; x++ {
+			for y := 0; y < len_y; y++ {
+				r, g, b, a := img.At(x, y).RGBA()
+				if r > val && g > val && b > val && a != 0 {
+					cell := Tuple{X: x, Y: len_y - y}
+					cells[cell] = struct{}{}
+				}
+			}
+		}
+
+	}
+
+	load_img(*inputP, cells)
 
 	ticker := time.NewTicker(pause_fps) // manage max frame delay
 	defer ticker.Stop()
