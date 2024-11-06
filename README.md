@@ -26,6 +26,7 @@ An interactive solution to the game of life using Golang and the `Pixel` 2D game
 - **Interactive controls** for starting, pausing, drawing and erasing cells, and resetting the game.
 - **Pan** to view different parts of the grid.
 - **Toggleable grid information** (frame rate, cell count, current generation).
+- **Add images** turns pixels in PNG files into cells whenever the pixel color is not black or fully transparent. 
 
 ## Usage
 
@@ -40,6 +41,7 @@ Flags:
 -h    The height of the grid (default 1500)
 -s    The scale of the cells (default 20)
 -f    Set the game FPS limit (default 20)
+-p    Add an image as "image_name.png" (default "")
 ```
 
 
